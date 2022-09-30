@@ -25,8 +25,8 @@ import {
   mintOneToken,
   SetupState,
 } from "./candy-machine";
-import { AlertState, formatNumber, getAtaForMint, toDate } from "./utils";
-import { MintCountdown } from "./MintCountdown";
+import { AlertState, formatNumber, getAtaForMint,  } from "./utils";
+//import { MintCountdown } from "./MintCountdown";
 import { MintButton } from "./MintButton";
 import { GatewayProvider } from "@civic/solana-gateway-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
@@ -36,7 +36,7 @@ const ConnectButton = styled(WalletDialogButton)`
   height: 60px;
   margin-top: 10px;
   margin-bottom: 5px;
-  background: linear-gradient(180deg, #604ae5 0%, #813eee 100%);
+  background: linear-gradient(180deg, #E8E1D9 0%, #125C13 100%);
   color: white;
   font-size: 16px;
   font-weight: bold;
@@ -62,7 +62,7 @@ const Home = (props: HomeProps) => {
     severity: undefined,
   });
   const [isActive, setIsActive] = useState(false);
-  const [endDate, setEndDate] = useState<Date>();
+  //const [endDate, setEndDate] = useState<Date>();
   const [itemsRemaining, setItemsRemaining] = useState<number>();
   const [isWhitelistUser, setIsWhitelistUser] = useState(false);
   const [isPresale, setIsPresale] = useState(false);
@@ -208,16 +208,16 @@ const Home = (props: HomeProps) => {
             active = active && valid;
           }
 
-          // datetime to stop the mint?
-          if (cndy?.state.endSettings?.endSettingType.date) {
-            setEndDate(toDate(cndy.state.endSettings.number));
-            if (
-              cndy.state.endSettings.number.toNumber() <
-              new Date().getTime() / 1000
-            ) {
-              active = false;
-            }
-          }
+          // // datetime to stop the mint?
+          // if (cndy?.state.endSettings?.endSettingType.date) {
+          //   setEndDate(toDate(cndy.state.endSettings.number));
+          //   if (
+          //     cndy.state.endSettings.number.toNumber() <
+          //     new Date().getTime() / 1000
+          //   ) {
+          //     active = false;
+          //   }
+          // }
           // amount to stop the mint?
           if (cndy?.state.endSettings?.endSettingType.amount) {
             const limit = Math.min(
@@ -445,28 +445,28 @@ const Home = (props: HomeProps) => {
     }
   };
 
-  const toggleMintButton = () => {
-    let active = !isActive || isPresale;
+  // const toggleMintButton = () => {
+  //   let active = !isActive || isPresale;
 
-    if (active) {
-      if (candyMachine!.state.isWhitelistOnly && !isWhitelistUser) {
-        active = false;
-      }
-      if (endDate && Date.now() >= endDate.getTime()) {
-        active = false;
-      }
-    }
+  //   if (active) {
+  //     if (candyMachine!.state.isWhitelistOnly && !isWhitelistUser) {
+  //       active = false;
+  //     }
+  //     if (endDate && Date.now() >= endDate.getTime()) {
+  //       active = false;
+  //     }
+  //   }
 
-    if (
-      isPresale &&
-      candyMachine!.state.goLiveDate &&
-      candyMachine!.state.goLiveDate.toNumber() <= new Date().getTime() / 1000
-    ) {
-      setIsPresale((candyMachine!.state.isPresale = false));
-    }
+  //   if (
+  //     isPresale &&
+  //     candyMachine!.state.goLiveDate &&
+  //     candyMachine!.state.goLiveDate.toNumber() <= new Date().getTime() / 1000
+  //   ) {
+  //     setIsPresale((candyMachine!.state.isPresale = false));
+  //   }
 
-    setIsActive((candyMachine!.state.isActive = active));
-  };
+  //   setIsActive((candyMachine!.state.isActive = active));
+  // };
 
   useEffect(() => {
     refreshCandyMachineState();
@@ -485,15 +485,24 @@ const Home = (props: HomeProps) => {
       }, 20000);
     })();
   }, [refreshCandyMachineState]);
-
+  
+  const SpazzImage = styled("img")`
+     width: 100%;
+     height: 30rem;
+     object-fit: cover;
+     object-position: top;
+     margin-bottom: 2.7rem;
+     border-radius: 10%;
+  `
   return (
     <Container style={{ marginTop: 100 }}>
       <Container maxWidth="xs" style={{ position: "relative" }}>
+        <SpazzImage src="/spazz.png" alt="spazz"/>
         <Paper
           style={{
             padding: 24,
             paddingBottom: 10,
-            backgroundColor: "#151A1F",
+            background: "linear-gradient(180deg, #125C13  0%, #E8E1D9 100%)",
             borderRadius: 6,
           }}
         >
@@ -541,7 +550,7 @@ const Home = (props: HomeProps) => {
                     </Typography>
                   </Grid>
                   <Grid item xs={5}>
-                    {isActive && endDate && Date.now() < endDate.getTime() ? (
+                    {/* {isActive && endDate && Date.now() < endDate.getTime() ? (
                       <>
                         <MintCountdown
                           key="endSettings"
@@ -589,7 +598,7 @@ const Home = (props: HomeProps) => {
                             </Typography>
                           )}
                       </>
-                    )}
+                    )} */}
                   </Grid>
                 </Grid>
               )}
@@ -668,23 +677,23 @@ const Home = (props: HomeProps) => {
   );
 };
 
-const getCountdownDate = (
-  candyMachine: CandyMachineAccount
-): Date | undefined => {
-  if (
-    candyMachine.state.isActive &&
-    candyMachine.state.endSettings?.endSettingType.date
-  ) {
-    return toDate(candyMachine.state.endSettings.number);
-  }
+// const getCountdownDate = (
+//   candyMachine: CandyMachineAccount
+// ): Date | undefined => {
+//   if (
+//     candyMachine.state.isActive &&
+//     candyMachine.state.endSettings?.endSettingType.date
+//   ) {
+//     return toDate(candyMachine.state.endSettings.number);
+//   }
 
-  return toDate(
-    candyMachine.state.goLiveDate
-      ? candyMachine.state.goLiveDate
-      : candyMachine.state.isPresale
-      ? new anchor.BN(new Date().getTime() / 1000)
-      : undefined
-  );
-};
+//   return toDate(
+//     candyMachine.state.goLiveDate
+//       ? candyMachine.state.goLiveDate
+//       : candyMachine.state.isPresale
+//       ? new anchor.BN(new Date().getTime() / 1000)
+//       : undefined
+//   );
+// };
 
 export default Home;
