@@ -26,7 +26,7 @@ import {
   SetupState,
 } from "./candy-machine";
 import { AlertState, formatNumber, getAtaForMint,  } from "./utils";
-//import { MintCountdown } from "./MintCountdown";
+import { MintCountdown } from "./MintCountdown";
 import { MintButton } from "./MintButton";
 import { GatewayProvider } from "@civic/solana-gateway-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
@@ -62,7 +62,7 @@ const Home = (props: HomeProps) => {
     severity: undefined,
   });
   const [isActive, setIsActive] = useState(false);
-  //const [endDate, setEndDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const [itemsRemaining, setItemsRemaining] = useState<number>();
   const [isWhitelistUser, setIsWhitelistUser] = useState(false);
   const [isPresale, setIsPresale] = useState(false);
@@ -133,7 +133,7 @@ const Home = (props: HomeProps) => {
               (!cndy.state.goLiveDate ||
                 cndy.state.goLiveDate.toNumber() > new Date().getTime() / 1000)
             ) {
-              presale = true;
+              presale = false;
             }
             // is there a discount?
             if (cndy.state.whitelistMintSettings.discountPrice) {
@@ -208,17 +208,17 @@ const Home = (props: HomeProps) => {
             active = active && valid;
           }
 
-          // // datetime to stop the mint?
-          // if (cndy?.state.endSettings?.endSettingType.date) {
-          //   setEndDate(toDate(cndy.state.endSettings.number));
-          //   if (
-          //     cndy.state.endSettings.number.toNumber() <
-          //     new Date().getTime() / 1000
-          //   ) {
-          //     active = false;
-          //   }
-          // }
-          // amount to stop the mint?
+          // datetime to stop the mint?
+          if (cndy?.state.endSettings?.endSettingType.date) {
+            setEndDate(toDate(cndy.state.endSettings.number));
+            if (
+              cndy.state.endSettings.number.toNumber() <
+              new Date().getTime() / 1000
+            ) {
+              active = false;
+            }
+          }
+          amount to stop the mint?
           if (cndy?.state.endSettings?.endSettingType.amount) {
             const limit = Math.min(
               cndy.state.endSettings.number.toNumber(),
@@ -445,28 +445,28 @@ const Home = (props: HomeProps) => {
     }
   };
 
-  // const toggleMintButton = () => {
-  //   let active = !isActive || isPresale;
+  const toggleMintButton = () => {
+    let active = !isActive || isPresale;
 
-  //   if (active) {
-  //     if (candyMachine!.state.isWhitelistOnly && !isWhitelistUser) {
-  //       active = false;
-  //     }
-  //     if (endDate && Date.now() >= endDate.getTime()) {
-  //       active = false;
-  //     }
-  //   }
+    if (active) {
+      if (candyMachine!.state.isWhitelistOnly && !isWhitelistUser) {
+        active = false;
+      }
+      if (endDate && Date.now() >= endDate.getTime()) {
+        active = false;
+      }
+    }
 
-  //   if (
-  //     isPresale &&
-  //     candyMachine!.state.goLiveDate &&
-  //     candyMachine!.state.goLiveDate.toNumber() <= new Date().getTime() / 1000
-  //   ) {
-  //     setIsPresale((candyMachine!.state.isPresale = false));
-  //   }
+    if (
+      isPresale &&
+      candyMachine!.state.goLiveDate &&
+      candyMachine!.state.goLiveDate.toNumber() <= new Date().getTime() / 1000
+    ) {
+      setIsPresale((candyMachine!.state.isPresale = false));
+    }
 
-  //   setIsActive((candyMachine!.state.isActive = active));
-  // };
+    setIsActive((candyMachine!.state.isActive = active));
+  };
 
   useEffect(() => {
     refreshCandyMachineState();
@@ -550,7 +550,7 @@ const Home = (props: HomeProps) => {
                     </Typography>
                   </Grid>
                   <Grid item xs={5}>
-                    {/* {isActive && endDate && Date.now() < endDate.getTime() ? (
+                 {isActive && endDate && Date.now() < endDate.getTime() ? (
                       <>
                         <MintCountdown
                           key="endSettings"
@@ -598,7 +598,7 @@ const Home = (props: HomeProps) => {
                             </Typography>
                           )}
                       </>
-                    )} */}
+                    )} 
                   </Grid>
                 </Grid>
               )}
@@ -677,23 +677,23 @@ const Home = (props: HomeProps) => {
   );
 };
 
-// const getCountdownDate = (
-//   candyMachine: CandyMachineAccount
-// ): Date | undefined => {
-//   if (
-//     candyMachine.state.isActive &&
-//     candyMachine.state.endSettings?.endSettingType.date
-//   ) {
-//     return toDate(candyMachine.state.endSettings.number);
-//   }
+const getCountdownDate = (
+  candyMachine: CandyMachineAccount
+): Date | undefined => {
+  if (
+    candyMachine.state.isActive &&
+    candyMachine.state.endSettings?.endSettingType.date
+  ) {
+    return toDate(candyMachine.state.endSettings.number);
+  }
 
-//   return toDate(
-//     candyMachine.state.goLiveDate
-//       ? candyMachine.state.goLiveDate
-//       : candyMachine.state.isPresale
-//       ? new anchor.BN(new Date().getTime() / 1000)
-//       : undefined
-//   );
-// };
+  return toDate(
+    candyMachine.state.goLiveDate
+      ? candyMachine.state.goLiveDate
+      : candyMachine.state.isPresale
+      ? new anchor.BN(new Date().getTime() / 1000)
+      : undefined
+  );
+};
 
 export default Home;
